@@ -21,5 +21,5 @@ int main()
         ppid=getppid();
         fprintf(1,"PARENT: The pid is: %d and ppid is: %d\n",pid,ppid);
     }
-    return 0;
+    exit(0);
 }

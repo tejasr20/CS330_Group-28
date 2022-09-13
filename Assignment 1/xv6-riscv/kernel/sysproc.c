@@ -103,3 +103,10 @@ sys_getppid(void)
   getppid(&ppid);
   return (uint64)ppid;
 }
+
+uint64
+sys_yield(void)
+{
+  yield();
+  return 0;
+}
