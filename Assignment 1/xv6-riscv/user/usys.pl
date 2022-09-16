@@ -38,3 +38,4 @@ entry("sleep");
 entry("uptime");
 entry("getppid");
 entry("yield");
+entry("getpa");

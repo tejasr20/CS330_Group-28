@@ -106,6 +106,8 @@ extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_getppid(void);
 extern uint64 sys_yield(void);
+extern uint64 sys_getpa(void);
+
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,7 +132,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_getppid] sys_getppid,
-[SYS_yield]   sys_yield
+[SYS_yield]   sys_yield,
+[SYS_getpa]   sys_getpa,
 };
 
 void

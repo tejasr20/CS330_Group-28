@@ -110,3 +110,12 @@ sys_yield(void)
   yield();
   return 0;
 }
+
+uint64
+sys_getpa(void *x)
+{
+  uint64 y;
+  long long k=(long long)x;
+  y=walkaddr(myproc()->pagetable,k)+(k & (PGSIZE-1));
+  return y;
+}

@@ -1,89 +1,85 @@
 
-user/_yield:     file format elf64-littleriscv
+user/_getpa:     file format elf64-littleriscv
 
 
 Disassembly of section .text:
 
 0000000000000000 <main>:
+#include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"
-#include "kernel/fs.h"
 
 int main()
 {
-   0:	1101                	addi	sp,sp,-32
-   2:	ec06                	sd	ra,24(sp)
-   4:	e822                	sd	s0,16(sp)
-   6:	e426                	sd	s1,8(sp)
-   8:	1000                	addi	s0,sp,32
-    int a;
-    int x=1;
-    
-    a=getpid();
-   a:	00000097          	auipc	ra,0x0
-   e:	3aa080e7          	jalr	938(ra) # 3b4 <getpid>
-  12:	862a                	mv	a2,a0
-    fprintf(1,"[%d] Parent has pid: %d\n",a,a);
-  14:	86aa                	mv	a3,a0
-  16:	00001597          	auipc	a1,0x1
-  1a:	85258593          	addi	a1,a1,-1966 # 868 <malloc+0xe6>
-  1e:	4505                	li	a0,1
-  20:	00000097          	auipc	ra,0x0
-  24:	676080e7          	jalr	1654(ra) # 696 <fprintf>
+   0:	7179                	addi	sp,sp,-48
+   2:	f406                	sd	ra,40(sp)
+   4:	f022                	sd	s0,32(sp)
+   6:	ec26                	sd	s1,24(sp)
+   8:	1800                	addi	s0,sp,48
+    int x;
+    x=1;
+   a:	4785                	li	a5,1
+   c:	fcf42e23          	sw	a5,-36(s0)
+    int pid=getpid();
+  10:	00000097          	auipc	ra,0x0
+  14:	3a4080e7          	jalr	932(ra) # 3b4 <getpid>
+  18:	84aa                	mv	s1,a0
+    fprintf(1,"[%d] The address of x before fork is: %d\n",pid,getpa(&x));
+  1a:	fdc40513          	addi	a0,s0,-36
+  1e:	00000097          	auipc	ra,0x0
+  22:	3c6080e7          	jalr	966(ra) # 3e4 <getpa>
+  26:	86aa                	mv	a3,a0
+  28:	8626                	mv	a2,s1
+  2a:	00001597          	auipc	a1,0x1
+  2e:	83e58593          	addi	a1,a1,-1986 # 868 <malloc+0xe6>
+  32:	4505                	li	a0,1
+  34:	00000097          	auipc	ra,0x0
+  38:	662080e7          	jalr	1634(ra) # 696 <fprintf>
     if(fork()==0)
-  28:	00000097          	auipc	ra,0x0
-  2c:	304080e7          	jalr	772(ra) # 32c <fork>
-  30:	e90d                	bnez	a0,62 <main+0x62>
+  3c:	00000097          	auipc	ra,0x0
+  40:	2f0080e7          	jalr	752(ra) # 32c <fork>
+  44:	ed05                	bnez	a0,7c <main+0x7c>
     {
-        yield(); // Making sure Parent executes First
-  32:	00000097          	auipc	ra,0x0
-  36:	3aa080e7          	jalr	938(ra) # 3dc <yield>
-        a=getpid();
-  3a:	00000097          	auipc	ra,0x0
-  3e:	37a080e7          	jalr	890(ra) # 3b4 <getpid>
-  42:	862a                	mv	a2,a0
-        fprintf(1,"[%d] Child executing %d\n",a,a);
-  44:	86aa                	mv	a3,a0
-  46:	00001597          	auipc	a1,0x1
-  4a:	84258593          	addi	a1,a1,-1982 # 888 <malloc+0x106>
-  4e:	4505                	li	a0,1
-  50:	00000097          	auipc	ra,0x0
-  54:	646080e7          	jalr	1606(ra) # 696 <fprintf>
-        fprintf(1,"[%d] Parent Yielded\n",a);
-        x=yield();
-        fprintf(1,"[%d] Parent got back control. Yield returned: %d\n",a,x);
+        pid=getpid();
+  46:	00000097          	auipc	ra,0x0
+  4a:	36e080e7          	jalr	878(ra) # 3b4 <getpid>
+  4e:	84aa                	mv	s1,a0
+        fprintf(1,"[%d] The address of x in child is: %d\n",pid,getpa(&x));
+  50:	fdc40513          	addi	a0,s0,-36
+  54:	00000097          	auipc	ra,0x0
+  58:	390080e7          	jalr	912(ra) # 3e4 <getpa>
+  5c:	86aa                	mv	a3,a0
+  5e:	8626                	mv	a2,s1
+  60:	00001597          	auipc	a1,0x1
+  64:	83858593          	addi	a1,a1,-1992 # 898 <malloc+0x116>
+  68:	4505                	li	a0,1
+  6a:	00000097          	auipc	ra,0x0
+  6e:	62c080e7          	jalr	1580(ra) # 696 <fprintf>
         wait(0);
     }
+
+
+
     exit(0);
-  58:	4501                	li	a0,0
-  5a:	00000097          	auipc	ra,0x0
-  5e:	2da080e7          	jalr	730(ra) # 334 <exit>
-        a=getpid();
-  62:	00000097          	auipc	ra,0x0
-  66:	352080e7          	jalr	850(ra) # 3b4 <getpid>
-  6a:	84aa                	mv	s1,a0
-        fprintf(1,"[%d] Parent executing\n",a);
-  6c:	862a                	mv	a2,a0
-  6e:	00001597          	auipc	a1,0x1
-  72:	83a58593          	addi	a1,a1,-1990 # 8a8 <malloc+0x126>
-  76:	4505                	li	a0,1
-  78:	00000097          	auipc	ra,0x0
-  7c:	61e080e7          	jalr	1566(ra) # 696 <fprintf>
-        fprintf(1,"[%d] Parent Yielded\n",a);
-  80:	8626                	mv	a2,s1
-  82:	00001597          	auipc	a1,0x1
-  86:	83e58593          	addi	a1,a1,-1986 # 8c0 <malloc+0x13e>
-  8a:	4505                	li	a0,1
-  8c:	00000097          	auipc	ra,0x0
-  90:	60a080e7          	jalr	1546(ra) # 696 <fprintf>
-        x=yield();
+  72:	4501                	li	a0,0
+  74:	00000097          	auipc	ra,0x0
+  78:	2c0080e7          	jalr	704(ra) # 334 <exit>
+        sleep(10);
+  7c:	4529                	li	a0,10
+  7e:	00000097          	auipc	ra,0x0
+  82:	346080e7          	jalr	838(ra) # 3c4 <sleep>
+        pid=getpid();
+  86:	00000097          	auipc	ra,0x0
+  8a:	32e080e7          	jalr	814(ra) # 3b4 <getpid>
+  8e:	84aa                	mv	s1,a0
+        fprintf(1,"[%d] The address of x in parent is: %d\n",pid,getpa(&x));
+  90:	fdc40513          	addi	a0,s0,-36
   94:	00000097          	auipc	ra,0x0
-  98:	348080e7          	jalr	840(ra) # 3dc <yield>
+  98:	350080e7          	jalr	848(ra) # 3e4 <getpa>
   9c:	86aa                	mv	a3,a0
-        fprintf(1,"[%d] Parent got back control. Yield returned: %d\n",a,x);
   9e:	8626                	mv	a2,s1
   a0:	00001597          	auipc	a1,0x1
-  a4:	83858593          	addi	a1,a1,-1992 # 8d8 <malloc+0x156>
+  a4:	82058593          	addi	a1,a1,-2016 # 8c0 <malloc+0x13e>
   a8:	4505                	li	a0,1
   aa:	00000097          	auipc	ra,0x0
   ae:	5ec080e7          	jalr	1516(ra) # 696 <fprintf>
@@ -91,7 +87,7 @@ int main()
   b2:	4501                	li	a0,0
   b4:	00000097          	auipc	ra,0x0
   b8:	288080e7          	jalr	648(ra) # 33c <wait>
-  bc:	bf71                	j	58 <main+0x58>
+  bc:	bf5d                	j	72 <main+0x72>
 
 00000000000000be <strcpy>:
 #include "kernel/fcntl.h"
@@ -820,7 +816,7 @@ printint(int fd, int xx, int base, int sgn)
     buf[i++] = digits[x % base];
  42e:	2601                	sext.w	a2,a2
  430:	00000517          	auipc	a0,0x0
- 434:	4e850513          	addi	a0,a0,1256 # 918 <digits>
+ 434:	4c050513          	addi	a0,a0,1216 # 8f0 <digits>
  438:	883a                	mv	a6,a4
  43a:	2705                	addiw	a4,a4,1
  43c:	02c5f7bb          	remuw	a5,a1,a2
@@ -930,7 +926,7 @@ vprintf(int fd, const char *fmt, va_list ap)
  4f8:	07000d93          	li	s11,112
     putc(fd, digits[x >> (sizeof(uint64) * 8 - 4)]);
  4fc:	00000b97          	auipc	s7,0x0
- 500:	41cb8b93          	addi	s7,s7,1052 # 918 <digits>
+ 500:	3f4b8b93          	addi	s7,s7,1012 # 8f0 <digits>
  504:	a839                	j	522 <vprintf+0x6a>
         putc(fd, c);
  506:	85ca                	mv	a1,s2
@@ -1084,7 +1080,7 @@ vprintf(int fd, const char *fmt, va_list ap)
  63a:	bdf9                	j	518 <vprintf+0x60>
           s = "(null)";
  63c:	00000917          	auipc	s2,0x0
- 640:	2d490913          	addi	s2,s2,724 # 910 <malloc+0x18e>
+ 640:	2ac90913          	addi	s2,s2,684 # 8e8 <malloc+0x166>
         while(*s != 0){
  644:	02800593          	li	a1,40
  648:	bff1                	j	624 <vprintf+0x16c>
@@ -1207,7 +1203,7 @@ free(void *ap)
  700:	ff050693          	addi	a3,a0,-16
   for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
  704:	00000797          	auipc	a5,0x0
- 708:	22c7b783          	ld	a5,556(a5) # 930 <freep>
+ 708:	2047b783          	ld	a5,516(a5) # 908 <freep>
  70c:	a805                	j	73c <free+0x42>
     if(p >= p->s.ptr && (bp > p || bp < p->s.ptr))
       break;
@@ -1266,7 +1262,7 @@ free(void *ap)
  772:	e394                	sd	a3,0(a5)
   freep = p;
  774:	00000717          	auipc	a4,0x0
- 778:	1af73e23          	sd	a5,444(a4) # 930 <freep>
+ 778:	18f73a23          	sd	a5,404(a4) # 908 <freep>
 }
  77c:	6422                	ld	s0,8(sp)
  77e:	0141                	addi	sp,sp,16
@@ -1301,7 +1297,7 @@ malloc(uint nbytes)
  7a4:	0485                	addi	s1,s1,1
   if((prevp = freep) == 0){
  7a6:	00000517          	auipc	a0,0x0
- 7aa:	18a53503          	ld	a0,394(a0) # 930 <freep>
+ 7aa:	16253503          	ld	a0,354(a0) # 908 <freep>
  7ae:	c515                	beqz	a0,7da <malloc+0x58>
     base.s.ptr = freep = prevp = &base;
     base.s.size = 0;
@@ -1326,15 +1322,15 @@ malloc(uint nbytes)
     }
     if(p == freep)
  7ce:	00000917          	auipc	s2,0x0
- 7d2:	16290913          	addi	s2,s2,354 # 930 <freep>
+ 7d2:	13a90913          	addi	s2,s2,314 # 908 <freep>
   if(p == (char*)-1)
  7d6:	5afd                	li	s5,-1
  7d8:	a88d                	j	84a <malloc+0xc8>
     base.s.ptr = freep = prevp = &base;
  7da:	00000797          	auipc	a5,0x0
- 7de:	15e78793          	addi	a5,a5,350 # 938 <base>
+ 7de:	13678793          	addi	a5,a5,310 # 910 <base>
  7e2:	00000717          	auipc	a4,0x0
- 7e6:	14f73723          	sd	a5,334(a4) # 930 <freep>
+ 7e6:	12f73323          	sd	a5,294(a4) # 908 <freep>
  7ea:	e39c                	sd	a5,0(a5)
     base.s.size = 0;
  7ec:	0007a423          	sw	zero,8(a5)
@@ -1354,7 +1350,7 @@ malloc(uint nbytes)
  804:	0137a423          	sw	s3,8(a5)
       freep = prevp;
  808:	00000717          	auipc	a4,0x0
- 80c:	12a73423          	sd	a0,296(a4) # 930 <freep>
+ 80c:	10a73023          	sd	a0,256(a4) # 908 <freep>
       return (void*)(p + 1);
  810:	01078513          	addi	a0,a5,16
       if((p = morecore(nunits)) == 0)

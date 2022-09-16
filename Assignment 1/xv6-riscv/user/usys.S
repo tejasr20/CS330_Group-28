@@ -115,3 +115,8 @@ yield:
  li a7, SYS_yield
  ecall
  ret
+.global getpa
+getpa:
+ li a7, SYS_getpa
+ ecall
+ ret
